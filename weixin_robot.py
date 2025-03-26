@@ -9,7 +9,9 @@ from PIL import Image
 from weixin_utils import time_sleep, scroll_down_by_count, get_chat_groups_offset_y
 from weixin_debug import print_children, print_attr
 from weixin_config import desired_caps, SHORT_INTERVAL, LONG_INTERVAL
-from weixin_ocr import OcrHelper
+from ocr_manager.ocr_manager import OcrManager
+from config_loader import get_tencent_config
+
 import re
 import time
 
@@ -167,10 +169,11 @@ def select_group(container_x1, container_y1, container_width, container_height,
         print(f"i={i}, item_name_x_offset={item_name_x_offset}, y1={y1}"
               f", container_x1 + container_width={container_x1 + container_width}, y2={y2}")
         cropped_image = img.crop((item_name_x_offset, y1, container_x1 + container_width, y2))
-        cropped_image.save(f"/Users/rcadmin/Downloads/1-{i}.png")
+        cropped_image_path = f"/Users/rcadmin/Downloads/1-{i}.png"
+        cropped_image.save(cropped_image_path)
 
         # 识别群聊名字
-        group_name = OcrHelper.get_group_name_from_image(cropped_image)
+        group_name = ocr_manager.recognize(cropped_image_path)
         print(f"[{i}] 识别出群名字：{group_name}")
 
         # 终止条件：如果识别结果为空，说明到了页面底部
@@ -380,6 +383,15 @@ forward_msg = "hello 世界，123你好啊！"
 
 
 start_time = time.time()  # 记录起始时间
+
+# 创建ocr
+
+app_id, app_key = get_tencent_config()
+print(f"App ID: {app_id}, App Key: {app_key}")
+
+ocr_manager = OcrManager(provider="tencent",
+                         app_id=app_id,
+                         app_key=app_key)
 
 # 连接 Appium Server
 driver = webdriver.Remote("http://127.0.0.1:4723",
