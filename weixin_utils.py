@@ -20,7 +20,7 @@ def scroll_down(driver):
 
     start_x = width // 2  # 屏幕中央
     start_y = height // 2  # 滑动起点（屏幕底部）
-    end_y = 0
+    end_y = 250
 
     # 通过 `perform_touch` 实现滑动
     interval = 1000
@@ -76,3 +76,46 @@ def get_chat_groups_offset_y(driver):
         return None
 
     return (first_item_y2 - first_item_y1)
+
+'''
+微信名中图形识别不好
+微信群聊里的企业微信图片识别不好
+数字带圆圈的识别不好 ①
+'''
+def post_process_ocrstr(result):
+    # 使用正则表达式移除括号中的数字及括号
+    if result:
+        # 去掉字符串最后类似 "(334)" 的部分，兼容未闭合括号如“（334”
+        result = re.sub(r"\(\d+\)?$", "", result)
+        # 全角符号转半角
+        result = re.sub(r'[“”]', '"', result)   # 中文双引号
+        result = re.sub(r'[‘’]', "'", result)   # 中文单引号
+        result = re.sub(r'｜', '|', result)    # 中文竖线
+        result = re.sub(r'，', ',', result)      # 中文逗号 
+        result = re.sub(r'。', '.', result)      # 中文句号
+        result = re.sub(r'！', '!', result)      # 中文感叹号
+        result = re.sub(r'？', '?', result)      # 中文问号
+        result = re.sub(r'：', ':', result)      # 中文冒号
+        result = re.sub(r'；', ';', result)      # 中文分号
+        result = re.sub(r'～', '~', result)      # 中文波浪号
+        result = re.sub(r'（', '(', result)      # 中文左括号
+        result = re.sub(r'）', ')', result)      # 中文右括号
+        result = re.sub(r'【', '[', result)      # 中文左方括号
+        result = re.sub(r'】', ']', result)      # 中文右方括号
+        result = re.sub(r'｛', '{', result)      # 中文左花括号
+        result = re.sub(r'｝', '}', result)      # 中文右花括号
+        result = re.sub(r'￥', '$', result)      # 中文货币符号
+        result = re.sub(r'　', ' ', result)      # 中文全角空格
+        result = re.sub(r'《', '<', result)      # 中文左书名号
+        result = re.sub(r'》', '>', result)      # 中文右书名号
+        # 移除所有空格（包括中间和首尾）
+        result = re.sub(r'\s+', '', result)  # 新增全局空格过滤
+        # 新增去除结尾连续点号
+        result = re.sub(r'\.+$', '', result)  # 匹配结尾1个或多个点
+        # 过滤纯数字且小于500的群名
+        if result.isdigit() and int(result) < 500:
+            result = ""
+        # 新增处理纯数字+右括号的情况（如"177)"）
+        result = re.sub(r'\d+\)$', '', result)
+
+    return result

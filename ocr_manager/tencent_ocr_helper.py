@@ -50,7 +50,7 @@ class TencentOcrHelper:
 
             # 返回 JSON 格式的响应
             # return resp.to_json_string()
-            return resp.TextDetections[0].DetectedText
+            return resp.TextDetections
         except TencentCloudSDKException as err:
             print(f"OCR 识别失败: {err}")
             return None
@@ -72,7 +72,7 @@ if __name__ == "__main__":
     ocr_helper = TencentOcrHelper(secret_id, secret_key)
 
     # 识别本地图片
-    image_path = "/Users/rcadmin/Downloads/1-0.png"
+    image_path = "/Users/rcadmin/Downloads/1-grouplist.png"
     result = ocr_helper.recognize(image_path)
 
     if result:

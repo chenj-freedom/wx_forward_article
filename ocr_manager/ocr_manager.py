@@ -30,20 +30,6 @@ class OcrManager:
 
     def recognize(self, image_path):
         result = self.ocr.recognize(image_path)
-
-        if isinstance(self.ocr, TencentOcrHelper):
-            result = self._post_process_tencent(result)
-
-        return result
-
-    def _post_process_tencent(self, result):
-        # 使用正则表达式移除括号中的数字及括号
-        if result:
-            # 去掉字符串最后类似 "(334)" 的部分
-            result = re.sub(r"\(\d+\)", "", result)
-            # 去除可能的多余空格
-            result = result.strip()
-
         return result
 
 
