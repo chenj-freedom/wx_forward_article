@@ -170,7 +170,8 @@ def forward_article_by_scroll(scroll_count):
             time_sleep(1)
 
         if selected_group_count > 0:
-            send_message_to_group()
+            # send_message_to_group()
+            return_to_article()     # for test，不执行转发步骤，但是可以测试跑流程
         else:
             print(f"没有找到未转发的群聊..返回到文章页..")
             return_to_article()
